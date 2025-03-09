@@ -8,8 +8,8 @@ on:
     branches:
       - master
   schedule:
-    #- cron: "0 0 * * *"
-    - cron: "*/10 * * * *"  # 调试用，正式使用改为 "0 0 * * *"
+    - cron: "0 0 * * *"  # 每天 UTC 00:00 运行
+    #- cron: "*/10 * * * *"  # 调试用，正式使用改为 "0 0 * * *"
 
 jobs:
   build:
@@ -24,19 +24,23 @@ jobs:
       GIST_TIMESTYLE: SHORT
 
     steps:
-      - name: Set up Go 1.x
-        uses: actions/setup-go@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
         with:
-          go-version: ^1.14
-        id: go
+          go-version: "1.20"
+      
+      - name: Install dependencies
+        run: go mod download
 
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
-      - name: Debug env variables
-        run: |
-          echo "WAKATIME_API_KEY: $WAKATIME_API_KEY"
-          echo "GH_TOKEN: $GH_TOKEN"
-          echo "GIST_ID: $GIST_ID"
+      #- name: Check out code into the Go module directory
+        #uses: actions/checkout@v2
+      #- name: Debug env variables
+        #run: |
+          #echo "WAKATIME_API_KEY: $WAKATIME_API_KEY"
+          #echo "GH_TOKEN: $GH_TOKEN"
+          #echo "GIST_ID: $GIST_ID"
 
       - name: Update-gist
         run: go run ./cmd/box/main.go 
